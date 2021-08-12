@@ -9,7 +9,6 @@ from NHentai.nhentai_async import NHentaiAsync
 from NHentai.entities.doujin import Doujin
 
 client = commands.Bot(description="Fetch the names of various sauces!",
-                      pm_help=False,
                       command_prefix=[],
                       case_insensitive=True,
                       help_command=None)
