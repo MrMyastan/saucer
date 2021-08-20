@@ -78,7 +78,7 @@ async def on_message(message: Message):
     if message.content.startswith(client.command_prefix + "help"):
         return
 
-    codes = re.findall(r"(?<!\d)\d{6}(?!\d)", message.content)
+    codes = re.findall(r"(?<!\d)\d{5,6}(?!\d)", message.content)
 
     if not codes:
         return
