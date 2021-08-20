@@ -2,11 +2,14 @@
 
 #import logging
 
+import re
+
 import discord
 from discord.ext import commands
 
 from NHentai.nhentai_async import NHentaiAsync
 from NHentai.entities.doujin import Doujin
+from discord.message import Message
 
 client = commands.Bot(description="Fetch the names of various sauces!",
                       command_prefix=[],
@@ -48,7 +51,7 @@ async def on_ready() -> None:
 @client.command()
 async def sauce(context: commands.Context, id: str) -> None:
 
-    if len(id) != 6 or id.isdecimal() != True:
+    if id.isdecimal() != True:
         await context.send("Invalid sauce code. A valid code is a 6 digit number")
         return
 
@@ -63,3 +66,32 @@ async def sauce(context: commands.Context, id: str) -> None:
 @client.command()
 async def help(context: commands.Context) -> None:    
     await context.send("Use !sauce with a 6 digit sauce code to locate it and it's title!")
+
+@client.listen()
+async def on_message(message: Message):
+    if message.author.id == client.user.id:
+        return
+
+    if message.content.startswith(client.command_prefix + "sauce"):
+        return
+
+    if message.content.startswith(client.command_prefix + "help"):
+        return
+
+    codes = re.findall(r"(?<!\d)\d{6}(?!\d)", message.content)
+
+    if not codes:
+        return
+
+    first = True
+    for code in codes:
+        doujin: Doujin = await nhentai.get_doujin(id=code)
+        if doujin is not None:
+            if first:
+                response = f"~~hehe sauce {code} is {doujin.title}~~"
+            else:
+                response = f"~~and {code} is {doujin.title}~~"
+            await message.reply(response, mention_author=False)
+            first = False
+
+
